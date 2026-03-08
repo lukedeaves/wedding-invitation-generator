@@ -1,0 +1,19 @@
+wedding:
+  bride_name: "Jane Doe"
+  groom_name: "John Smith"
+  date: "01 JAN 2026"
+  time: "12:30"
+  venue:
+    name: "Sample Venue"
+    address_1: "Address Line 1"
+    address_2: "City"
+    postcode: "POSTAL/ZIP CODE"
+  reception_note: "Reception to follow"
+
+output:
+  directory: "./generated_invitations"
+
+guests:
+  - guest_names: "John Doe"
+  - guest_names: "Jane Smith"
+  - guest_names: "Mr. and Mrs. Johnson"
