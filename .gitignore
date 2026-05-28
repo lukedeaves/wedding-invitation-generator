@@ -6,7 +6,8 @@ Thumbs.db
 Desktop.ini
 
 # IDE
-.vscode/
+.vscode/*
+!.vscode/settings.json
 
 # Logs
 *.log
@@ -15,3 +16,13 @@ Desktop.ini
 *.tmp
 *.temp
 .cache/
+
+# Python
+.venv/
+venv/
+__pycache__/
+*.pyc
+
+# Generated output
+generated_invitations/
+preview-*.pdf

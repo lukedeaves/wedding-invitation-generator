@@ -1,0 +1,29 @@
+# Visual style for your invitations (optional — defaults work well)
+page:
+  size: letter  # letter | a4 | a5
+
+colors:
+  background: [0.98, 0.98, 0.96]
+  gold: [0.72, 0.58, 0.28]
+  text_dark: [0.18, 0.18, 0.18]
+  text_light: [0.42, 0.42, 0.42]
+
+fonts:
+  guest_size: 17
+  invite_line_size: 14
+  name_size: 40
+  name_min_size: 26
+  and_size: 18
+  detail_size: 12
+  date_day_size: 18
+  reception_size: 11
+
+layout:
+  margin_inches: 0.75
+  content_width_inches: 6.0
+
+copy:
+  invitation_line: "You are invited to the wedding of"
+  connector: "and"
+  default_guest: "Dear Guest"
+  default_reception: "Reception to follow"

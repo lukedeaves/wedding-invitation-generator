@@ -1,0 +1,32 @@
+# Wedding Invitation Generator — fill in your details below.
+# Save this file as config.yaml (or copy: cp config.example.yaml config.yaml)
+
+wedding:
+  # Names shown in elegant script on the invitation
+  bride_name: "Jane Doe"
+  groom_name: "John Smith"
+
+  # Date — flexible formats all work, e.g. "15 June 2026", "2026-06-15", "15/06/2026"
+  date: "01 January 2026"
+  time: "12:30"
+
+  venue:
+    name: "The Garden Barn"
+    address_1: "123 Country Lane"
+    address_2: "York"
+    postcode: "YO1 2AB"
+
+  reception_note: "Reception to follow"
+
+output:
+  # Folder where PDF files will be saved
+  directory: "./generated_invitations"
+
+# One invitation per guest. Add as many lines as you need.
+guests:
+  - guest_names: "Mr. John Doe"
+  - guest_names: "Ms. Jane Smith"
+  - guest_names: "Mr. and Mrs. Johnson"
+
+# Optional: import guests from a spreadsheet instead (see guests.example.csv)
+# guests_file: "./guests.csv"
