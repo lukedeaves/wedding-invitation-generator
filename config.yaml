@@ -8,7 +8,7 @@ wedding:
     address_1: "123 Country Lane"
     address_2: "York"
     postcode: "YO1 2AB"
-  reception_note: "Reception to follow"
+  reception_note: "Dinner and dancing to follow"
 
 output:
   directory: "./generated_invitations"

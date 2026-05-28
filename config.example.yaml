@@ -16,7 +16,7 @@ wedding:
     address_2: "York"
     postcode: "YO1 2AB"
 
-  reception_note: "Reception to follow"
+  reception_note: "Dinner and dancing to follow"
 
 output:
   # Folder where PDF files will be saved

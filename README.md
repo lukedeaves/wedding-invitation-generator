@@ -116,7 +116,7 @@ Open `config.yaml` in VS Code or Cursor with the YAML extension — `config.sche
 
 ## Design
 
-Invitations use a cream background, gold accents, corner flourishes, and centered typography. Couple names use an elegant script face; details use a refined serif. The look is intentionally minimal and print-friendly.
+Invitations use a warm ivory card with layered gold frames, sage botanical corner art, and editorial typography. Guest names and venue appear in refined small caps; couple names are set in script with a decorative ampersand; the date sits in a centred medallion. Customize colours, wording, and sizes in `design.yaml`.
 
 ## License
 

@@ -52,7 +52,7 @@ def format_wedding_date(date_input: str) -> tuple[str, str, str]:
         ) from exc
 
     day = f"{parsed.day:02d}"
-    month = parsed.strftime("%b").upper()
+    month = parsed.strftime("%B").upper()
     year = str(parsed.year)
     return day, month, year
 

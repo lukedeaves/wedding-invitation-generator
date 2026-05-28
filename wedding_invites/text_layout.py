@@ -1,7 +1,5 @@
 """Text measurement and drawing helpers for ReportLab canvas."""
 
-from typing import Tuple
-
 from reportlab.lib.enums import TA_CENTER
 from reportlab.lib.styles import ParagraphStyle
 from reportlab.pdfgen import canvas
@@ -83,3 +81,45 @@ def draw_centered_paragraph(
     x = (page_width - w) / 2
     para.drawOn(c, x, top_y - h)
     return top_y - h - 0.15 * 72  # small gap in points
+
+
+def draw_centered_spaced_caps(
+    c: canvas.Canvas,
+    text: str,
+    y: float,
+    page_width: float,
+    font: str,
+    size: float,
+    color,
+    tracking: float = 2.5,
+) -> float:
+    """Draw centred text with increased letter spacing (small-caps feel)."""
+    c.setFillColor(color)
+    c.setFont(font, size)
+    upper = text.upper()
+    total = sum(c.stringWidth(ch, font, size) + tracking for ch in upper) - tracking
+    x = (page_width - total) / 2
+    for ch in upper:
+        c.drawString(x, y, ch)
+        x += c.stringWidth(ch, font, size) + tracking
+    return y - size * 1.4
+
+
+def draw_centered_lines(
+    c: canvas.Canvas,
+    lines: list[str],
+    top_y: float,
+    page_width: float,
+    font: str,
+    size: float,
+    color,
+    leading: float | None = None,
+) -> float:
+    """Draw multiple centred single lines; returns y below last line."""
+    if leading is None:
+        leading = size * 1.35
+    y = top_y
+    for line in lines:
+        y = draw_centered_text(c, line, y, page_width, font, size, color)
+        y += leading - size * 1.35  # adjust for draw_centered_text built-in gap
+    return y
