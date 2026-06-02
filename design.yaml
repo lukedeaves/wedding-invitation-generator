@@ -16,9 +16,9 @@ fonts:
   guest_size: 14
   guest_tracking: 2.8
   invite_line_size: 12
-  name_size: 46
-  name_min_size: 30
-  ampersand_size: 34
+  name_size: 44
+  name_min_size: 28
+  ampersand_size: 26
   time_size: 12
   venue_name_size: 12
   detail_size: 11

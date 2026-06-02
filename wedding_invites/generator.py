@@ -24,6 +24,12 @@ from wedding_invites.text_layout import (
     fit_font_size,
 )
 
+# Vertical rhythm (inches) — tuned to avoid footer overlap on letter size
+GAP_SM = 0.14
+GAP_MD = 0.22
+GAP_LG = 0.30
+GAP_SECTION = 0.38
+
 
 class WeddingInvitationGenerator:
     """Generates personalized wedding invitation PDFs."""
@@ -48,9 +54,48 @@ class WeddingInvitationGenerator:
         self.fonts = self.design["fonts"]
         self.copy = self.design["copy"]
 
+    def _content_bottom(self) -> float:
+        """Lowest Y for text (above bottom botanicals)."""
+        return self.frame_inset + 0.62 * inch
+
+    def _content_top(self) -> float:
+        return self.page_height - self.frame_inset - 0.52 * inch
+
     def _draw_background(self, c: canvas.Canvas) -> None:
         c.setFillColor(self.colors["background"])
         c.rect(0, 0, self.page_width, self.page_height, fill=1, stroke=0)
+
+    def _draw_couple_names(
+        self,
+        c: canvas.Canvas,
+        y: float,
+        bride: str,
+        groom: str,
+        script: str,
+        gold,
+    ) -> float:
+        """Draw couple names with a compact ornamental ampersand."""
+        amp_size = self.fonts["ampersand_size"]
+
+        bride_size = fit_font_size(
+            c, bride, script, self.fonts["name_size"], self.fonts["name_min_size"], self.content_w
+        )
+        y = draw_centered_text(
+            c, bride, y, self.page_width, script, bride_size, gold
+        )
+        # Extra room for script descenders before the ampersand
+        y -= max(GAP_MD * inch, bride_size * 0.22)
+
+        draw_centered_text(c, "&", y, self.page_width, script, amp_size, gold)
+        y -= amp_size * 0.95 + GAP_SM * inch
+
+        groom_size = fit_font_size(
+            c, groom, script, self.fonts["name_size"], self.fonts["name_min_size"], self.content_w
+        )
+        y = draw_centered_text(
+            c, groom, y, self.page_width, script, groom_size, gold
+        )
+        return y
 
     def _draw_text_content(self, c: canvas.Canvas, invitation_data: Dict) -> None:
         script = fonts.script_font()
@@ -59,18 +104,15 @@ class WeddingInvitationGenerator:
         gold = self.colors["gold"]
         text_dark = self.colors["text_dark"]
         text_light = self.colors["text_light"]
+        bottom_limit = self._content_bottom()
 
-        content_inset = self.frame_inset + 0.38 * inch
-        y = self.page_height - content_inset - 0.55 * inch
+        y = self._content_top()
 
-        # Header emblem
         draw_header_emblem(c, y, self.page_width, self.colors)
-        y -= 0.55 * inch
+        y -= 0.48 * inch
+        draw_ornament_divider(c, y, self.page_width, self.colors, width=3.0 * inch)
+        y -= GAP_SECTION * inch
 
-        draw_ornament_divider(c, y, self.page_width, self.colors, width=3.2 * inch)
-        y -= 0.38 * inch
-
-        # Guest honour line
         guest = invitation_data.get("guest_names") or self.copy["default_guest"]
         prefix = (self.copy.get("guest_prefix") or "").strip()
         guest_line = f"{prefix} {guest}".strip() if prefix else guest
@@ -84,56 +126,33 @@ class WeddingInvitationGenerator:
             text_dark,
             tracking=self.fonts.get("guest_tracking", 2.5),
         )
-        y -= 0.12 * inch
+        y -= GAP_MD * inch
 
-        draw_ornament_divider(c, y, self.page_width, self.colors, width=2.8 * inch, style="dot")
-        y -= 0.42 * inch
+        draw_ornament_divider(c, y, self.page_width, self.colors, width=2.6 * inch, style="dot")
+        y -= GAP_SECTION * inch
 
-        # Invitation copy (may include line break)
         invite = self.copy["invitation_line"]
         y = draw_centered_paragraph(
             c,
             invite,
             y,
             self.page_width,
-            self.content_w * 0.92,
+            self.content_w * 0.9,
             body_italic,
             self.fonts["invite_line_size"],
             text_light,
-            leading=self.fonts["invite_line_size"] * 1.45,
+            leading=self.fonts["invite_line_size"] * 1.4,
         )
-        y -= 0.2 * inch
+        y -= GAP_MD * inch
 
-        # Couple names with ornamental ampersand
         bride = invitation_data.get("bride_name", "")
         groom = invitation_data.get("groom_name", "")
+        y = self._draw_couple_names(c, y, bride, groom, script, gold)
+        y -= GAP_LG * inch
 
-        for index, name in enumerate((bride, groom)):
-            if index == 1:
-                amp_size = self.fonts["ampersand_size"]
-                y -= 0.08 * inch
-                draw_centered_text(
-                    c, "&", y, self.page_width, script, amp_size, gold
-                )
-                y -= amp_size * 0.95
+        draw_ornament_divider(c, y, self.page_width, self.colors, width=3.6 * inch)
+        y -= GAP_SECTION * inch
 
-            name_size = fit_font_size(
-                c,
-                name,
-                script,
-                self.fonts["name_size"],
-                self.fonts["name_min_size"],
-                self.content_w,
-            )
-            y = draw_centered_text(
-                c, name, y - 0.08 * inch, self.page_width, script, name_size, gold
-            )
-
-        y -= 0.28 * inch
-        draw_ornament_divider(c, y, self.page_width, self.colors, width=4.0 * inch)
-        y -= 0.55 * inch
-
-        # Date medallion + time & venue column
         date_parts = invitation_data.get("date_parts")
         if not date_parts:
             date_str = invitation_data.get("date_display") or invitation_data.get("date", "")
@@ -142,19 +161,27 @@ class WeddingInvitationGenerator:
 
         day, month, year = date_parts
         cx = self.page_width / 2
-        medallion_y = y - 0.55 * inch
+        medallion_h = 1.35 * inch
+        medallion_y = y - medallion_h / 2
         draw_date_medallion(
-            c, cx, medallion_y, day, month, year, self.fonts, self.colors, body
+            c,
+            cx,
+            medallion_y,
+            day,
+            month,
+            year,
+            self.fonts,
+            self.colors,
+            body,
+            body_italic,
         )
+        y = medallion_y - medallion_h / 2 - GAP_MD * inch
 
-        y = medallion_y - 0.95 * inch
-
-        # Time
         time_str = invitation_data.get("time", "")
         time_prefix = self.copy.get("time_prefix", "at")
-        time_line = f"{time_prefix} {time_str}".strip() if time_str else ""
-        if time_line:
-            y = draw_centered_spaced_caps(
+        if time_str:
+            time_line = f"{time_prefix} {time_str}".strip()
+            y = draw_centered_text(
                 c,
                 time_line,
                 y,
@@ -162,31 +189,27 @@ class WeddingInvitationGenerator:
                 body_italic,
                 self.fonts["time_size"],
                 text_dark,
-                tracking=1.8,
             )
-            y -= 0.08 * inch
+            y -= GAP_SM * inch
 
         draw_ornament_divider(
-            c, y, self.page_width, self.colors, width=2.4 * inch, style="dot"
+            c, y, self.page_width, self.colors, width=2.2 * inch, style="dot"
         )
-        y -= 0.35 * inch
+        y -= GAP_SECTION * inch
 
-        # Venue block
         venue = invitation_data.get("venue") or {}
         venue_name = venue.get("name", "")
         if venue_name:
-            name_size = self.fonts["venue_name_size"]
-            y = draw_centered_spaced_caps(
+            y = draw_centered_text(
                 c,
                 venue_name,
                 y,
                 self.page_width,
                 body,
-                name_size,
+                self.fonts["venue_name_size"],
                 text_dark,
-                tracking=2.0,
             )
-            y -= 0.06 * inch
+            y -= GAP_SM * inch
 
         address_lines = [
             venue.get("address_1", ""),
@@ -194,35 +217,35 @@ class WeddingInvitationGenerator:
             venue.get("postcode", ""),
         ]
         address_lines = [line for line in address_lines if line]
-
+        detail_size = self.fonts["detail_size"]
         for line in address_lines:
             y = draw_centered_text(
-                c,
-                line,
-                y,
-                self.page_width,
-                body,
-                self.fonts["detail_size"],
-                text_light,
+                c, line, y, self.page_width, body, detail_size, text_light
             )
-            y += 0.04 * inch
+            y -= 0.03 * inch
 
-        # Footer
-        footer_y = content_inset + 0.95 * inch
+        # Footer always flows downward after venue (never jump upward)
+        y -= GAP_LG * inch
         draw_ornament_divider(
-            c, footer_y + 0.35 * inch, self.page_width, self.colors, width=3.0 * inch
+            c, y, self.page_width, self.colors, width=2.8 * inch, style="diamond"
         )
+        y -= GAP_MD * inch
 
         reception = invitation_data.get("reception_note") or self.copy["default_reception"]
+        reception_size = self.fonts["reception_size"]
+
+        if y < bottom_limit:
+            y = bottom_limit
+
         draw_centered_spaced_caps(
             c,
             reception,
-            footer_y,
+            y,
             self.page_width,
             body_italic,
-            self.fonts["reception_size"],
+            reception_size,
             text_light,
-            tracking=1.5,
+            tracking=1.2,
         )
 
     def generate_invitation(

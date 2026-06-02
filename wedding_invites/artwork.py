@@ -239,6 +239,15 @@ def draw_header_emblem(c: canvas.Canvas, y: float, page_width: float, colors: di
         _bezier_leaf(c, (cx, y), angle, 0.42 * inch, sage, stroke=0.6)
 
 
+def _draw_medallion_floret(c: canvas.Canvas, x: float, y: float, colors: dict) -> None:
+    """Small four-petal floret for medallion corners."""
+    gold = colors.get("gold_light", colors["gold"])
+    c.setFillColor(gold)
+    r = 2.2
+    for dx, dy in ((0, r), (r, 0), (0, -r), (-r, 0)):
+        c.circle(x + dx, y + dy, 1.4, fill=1, stroke=0)
+
+
 def draw_date_medallion(
     c: canvas.Canvas,
     cx: float,
@@ -249,37 +258,69 @@ def draw_date_medallion(
     fonts: dict,
     colors: dict,
     body_font: str,
+    body_italic: str,
 ) -> Tuple[float, float]:
-    """Draw date as a centred medallion; returns (width, height) of block."""
+    """Draw date in an ornamental ellipse medallion; returns (width, height)."""
     gold = colors["gold"]
     gold_light = colors.get("gold_light", gold)
+    panel = colors.get("panel", colors["background"])
     text = colors["text_dark"]
 
-    w_box = 1.55 * inch
-    h_box = 1.35 * inch
+    w_box = 1.72 * inch
+    h_box = 1.22 * inch
     left = cx - w_box / 2
     bottom = cy - h_box / 2
 
+    # Soft inner fill
+    c.setFillColor(panel)
     c.setStrokeColor(gold_light)
-    c.setLineWidth(0.75)
-    c.roundRect(left, bottom, w_box, h_box, 8, fill=0, stroke=1)
+    c.setLineWidth(0.55)
+    c.ellipse(left, bottom, left + w_box, bottom + h_box, fill=1, stroke=1)
 
+    # Outer accent ellipse
+    pad = 0.06 * inch
+    c.setStrokeColor(gold)
+    c.setLineWidth(1.0)
+    c.ellipse(
+        left - pad,
+        bottom - pad * 0.6,
+        left + w_box + pad,
+        bottom + h_box + pad * 0.6,
+        fill=0,
+        stroke=1,
+    )
+
+    # Corner flourishes on the frame
+    for fx, fy in (
+        (left + w_box * 0.12, bottom + h_box + 0.02 * inch),
+        (left + w_box * 0.88, bottom + h_box + 0.02 * inch),
+        (left + w_box * 0.12, bottom - 0.02 * inch),
+        (left + w_box * 0.88, bottom - 0.02 * inch),
+    ):
+        _draw_medallion_floret(c, fx, fy, colors)
+
+    # Horizontal accent through centre
+    c.setStrokeColor(gold_light)
+    c.setLineWidth(0.4)
+    c.line(cx - w_box * 0.32, cy - 0.02 * inch, cx + w_box * 0.32, cy - 0.02 * inch)
+
+    day_size = fonts.get("date_day_size", 34)
     c.setFillColor(text)
-    day_size = fonts.get("date_day_size", 36)
     c.setFont(body_font, day_size)
     dw = c.stringWidth(day, body_font, day_size)
-    c.drawString(cx - dw / 2, cy + 0.12 * inch, day)
+    c.drawString(cx - dw / 2, cy + 0.14 * inch, day)
 
-    month_size = fonts.get("date_month_size", 11)
-    c.setFont(body_font, month_size)
+    month_size = fonts.get("date_month_size", 10)
+    c.setFont(body_italic, month_size)
     c.setFillColor(gold)
-    mw = c.stringWidth(month, body_font, month_size)
-    c.drawString(cx - mw / 2, cy - 0.08 * inch, month)
+    month_display = month.title() if month.isupper() else month
+    mw = c.stringWidth(month_display, body_italic, month_size)
+    c.drawString(cx - mw / 2, cy - 0.1 * inch, month_display)
 
-    year_size = fonts.get("date_year_size", 10)
+    year_size = fonts.get("date_year_size", 9)
     c.setFillColor(colors["text_light"])
     c.setFont(body_font, year_size)
     yw = c.stringWidth(year, body_font, year_size)
-    c.drawString(cx - yw / 2, cy - 0.28 * inch, year)
+    c.drawString(cx - yw / 2, cy - 0.26 * inch, year)
 
-    return w_box, h_box
+    return w_box, h_box + pad
