@@ -1,0 +1,42 @@
+# Visual style for your invitations
+page:
+  size: letter  # letter | a4 | a5
+
+colors:
+  background: [0.96, 0.93, 0.88]   # warm ivory
+  panel: [0.99, 0.98, 0.96]        # inner card
+  gold: [0.58, 0.44, 0.20]         # champagne gold
+  gold_light: [0.78, 0.66, 0.38]
+  sage: [0.52, 0.62, 0.54]         # botanical accents
+  sage_dark: [0.34, 0.44, 0.38]
+  text_dark: [0.14, 0.13, 0.12]
+  text_light: [0.48, 0.44, 0.40]
+
+fonts:
+  guest_size: 14
+  guest_tracking: 2.8
+  invite_line_size: 12
+  name_size: 44
+  name_min_size: 28
+  ampersand_size: 26
+  time_size: 12
+  venue_name_size: 12
+  detail_size: 11
+  date_day_size: 36
+  date_month_size: 11
+  date_year_size: 10
+  reception_size: 10
+
+layout:
+  margin_inches: 0.75
+  content_width_inches: 5.5
+  frame_inset_inches: 0.38
+
+copy:
+  guest_prefix: ""
+  invitation_line: |
+    request the pleasure of your company
+    at the celebration of the marriage of
+  time_prefix: "at"
+  default_guest: "Dear Guest"
+  default_reception: "Dinner and dancing to follow"
